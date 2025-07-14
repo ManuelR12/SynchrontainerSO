@@ -1,0 +1,78 @@
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Probar Subida de Archivos</title>
+        <style>
+            body { font-family: sans-serif; margin: 20px; }
+            form { border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; }
+            input[type="file"] { margin-bottom: 10px; }
+            button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+            button:hover { background-color: #45a049; }
+            #response { margin-top: 20px; padding: 10px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <h1>Subir Archivo al Contenedor Actual</h1>
+        <p>Selecciona un archivo y súbelo al contenedor. Se guardará en la carpeta `public`.</p>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileInput" required>
+            <br>
+            <button type="submit">Subir Archivo</button>
+        </form>
+
+        <div id="response"></div>
+
+        <script>
+            document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Evita que el formulario se envíe de la forma tradicional
+
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('Por favor, selecciona un archivo.');
+                    return;
+                }
+
+                const filename = file.name;
+                // El UID 'current' es un placeholder. En un escenario real, obtendrías el UID del contenedor.
+                const uid = 'current'; // Usamos "current" porque tu app.py lo maneja
+
+                const formData = new FormData();
+                formData.append('file', file); // 'file' debe coincidir con 'request.files['file']' en Flask
+
+                const responseDiv = document.getElementById('response');
+                responseDiv.innerHTML = 'Subiendo...';
+
+                try {
+                    const response = await fetch(`http://localhost:5000/upload/${uid}/${filename}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        responseDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                        console.log('Respuesta del servidor:', data);
+
+                        // Opcional: Sugerir cómo descargar el archivo
+                        const downloadLink = `http://localhost:5000/download/${filename}`;
+                        responseDiv.innerHTML += `<p>Puedes intentar descargar el archivo aquí: <a href="${downloadLink}" target="_blank">${filename}</a></p>`;
+
+                    } else {
+                        responseDiv.innerHTML = `<p style="color: red;">Error: ${data.error || 'Algo salió mal'}</p>`;
+                        console.error('Error al subir:', data);
+                    }
+                } catch (error) {
+                    responseDiv.innerHTML = `<p style="color: red;">Error de conexión: ${error.message}</p>`;
+                    console.error('Error de red:', error);
+                }
+            });
+        </script>
+    </body>
+    </html>
+    
