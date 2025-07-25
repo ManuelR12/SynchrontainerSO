@@ -3,84 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Probar Subida de Archivos a la Red Synchrontainer</title>
+    <title>Synchrontainer - Panel de Pruebas Completo</title>
     <style>
-        body { font-family: system-ui, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #0056b3; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="file"], select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-        button { padding: 12px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
-        button:hover { background-color: #218838; }
-        #response { margin-top: 20px; padding: 15px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 5px; min-height: 50px; word-wrap: break-word; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f2f5; }
+        .header { background-color: #1c2939; color: white; padding: 20px; text-align: center; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; }
+        h2 { margin-top: 0; color: #1c2939; border-bottom: 2px solid #e1e4e8; padding-bottom: 10px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5da; box-sizing: border-box; }
+        button { background-color: #2ea44f; color: white; font-weight: 600; border: none; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #2c974b; }
+        button.secondary { background-color: #0366d6; }
+        button.secondary:hover { background-color: #005cc5; }
+        button.danger { background-color: #d73a49; }
+        button.danger:hover { background-color: #cb2431; }
+        .response { margin-top: 15px; background: #f6f8fa; padding: 15px; border-radius: 6px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; }
+        .success { color: #2ea44f; }
+        .error { color: #d73a49; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Subir Archivo a la Red</h1>
-        <form id="uploadForm" enctype="multipart/form-data">
-            
-            <div class="form-group">
-                <label for="port">Puerto de Conexión:</label>
-                <input type="text" id="port" value="5001" required>
-            </div>
 
-            <div class="form-group">
-                <label for="uid">ID del Contenedor Destino:</label>
-                <input type="text" id="uid" value="c1" required>
-            </div>
+    <header class="header">
+        <h1>Synchrontainer - Panel de Pruebas</h1>
+    </header>
 
+    <main class="grid-container">
+        <!-- SECCIÓN 1: LISTAR ARCHIVOS -->
+        <section class="card">
+            <h2>1. Listar Archivos de la Red</h2>
             <div class="form-group">
-                <label for="folder">Carpeta de Destino:</label>
-                <select id="folder" name="folder">
-                    <option value="public" selected>Public</option>
-                    <option value="private">Private</option>
-                </select>
+                <label for="listPort">Puerto de Conexión:</label>
+                <input type="text" id="listPort" value="5001">
             </div>
-            
-            <div class="form-group">
-                <label for="fileInput">Selecciona el archivo:</label>
-                <input type="file" id="fileInput" required>
-            </div>
+            <button id="listPublicBtn" class="secondary">Listar Públicos</button>
+            <button id="listPrivateBtn" style="margin-top: 10px;">Listar Privados</button>
+            <div id="listResponse" class="response">Los resultados aparecerán aquí...</div>
+        </section>
 
-            <button type="submit">Subir Archivo</button>
-        </form>
+        <!-- SECCIÓN 2: SUBIR ARCHIVO -->
+        <section class="card">
+            <h2>2. Subir un Archivo</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="uploadPort">Puerto de Conexión:</label>
+                    <input type="text" id="uploadPort" value="5001" required>
+                </div>
+                <div class="form-group">
+                    <label for="uploadUid">ID Destino:</label>
+                    <input type="text" id="uploadUid" value="c1" required>
+                </div>
+                <div class="form-group">
+                    <label for="uploadFolder">Carpeta Destino:</label>
+                    <select id="uploadFolder" required>
+                        <option value="public" selected>Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fileInput">Archivo:</label>
+                    <input type="file" id="fileInput" required>
+                </div>
+                <button type="submit">Subir Archivo</button>
+            </form>
+            <div id="uploadResponse" class="response"></div>
+        </section>
 
-        <div id="response">Esperando subida...</div>
-    </div>
+        <!-- SECCIÓN 3: DESCARGAR ARCHIVO -->
+        <section class="card">
+            <h2>3. Descargar un Archivo Específico</h2>
+            <form id="downloadForm">
+                <div class="form-group">
+                    <label for="downloadPort">Puerto de Conexión:</label>
+                    <input type="text" id="downloadPort" value="5001" required>
+                </div>
+                <div class="form-group">
+                    <label for="downloadUid">ID del Contenedor que tiene el archivo:</label>
+                    <input type="text" id="downloadUid" value="c1" required>
+                </div>
+                <div class="form-group">
+                    <label for="downloadFolder">Carpeta donde está el archivo:</label>
+                    <select id="downloadFolder" required>
+                        <option value="public" selected>Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="downloadFilename">Nombre del Archivo:</label>
+                    <input type="text" id="downloadFilename" placeholder="ej: reporte.pdf" required>
+                </div>
+                <button type="submit">Generar Link de Descarga</button>
+            </form>
+            <div id="downloadResponse" class="response"></div>
+        </section>
+
+        <!-- SECCIÓN 4: ELIMINAR ARCHIVO -->
+        <section class="card">
+            <h2>4. Eliminar un Archivo Específico</h2>
+            <form id="deleteForm">
+                <div class="form-group">
+                    <label for="deletePort">Puerto de Conexión:</label>
+                    <input type="text" id="deletePort" value="5001" required>
+                </div>
+                <div class="form-group">
+                    <label for="deleteUid">ID del Contenedor que tiene el archivo:</label>
+                    <input type="text" id="deleteUid" value="c1" required>
+                </div>
+                <div class="form-group">
+                    <label for="deleteFilename">Nombre del Archivo:</label>
+                    <input type="text" id="deleteFilename" placeholder="ej: temporal.tmp" required>
+                </div>
+                <button type="submit" class="danger">Eliminar Archivo</button>
+            </form>
+            <div id="deleteResponse" class="response"></div>
+        </section>
+    </main>
 
     <script>
+        // --- LÓGICA PARA LISTAR ---
+        document.getElementById('listPublicBtn').addEventListener('click', () => listFiles('public'));
+        document.getElementById('listPrivateBtn').addEventListener('click', () => listFiles('private'));
+
+        async function listFiles(folderType) {
+            const port = document.getElementById('listPort').value;
+            const responseDiv = document.getElementById('listResponse');
+            responseDiv.textContent = 'Cargando...';
+            try {
+                const response = await fetch(`http://localhost:${port}/${folderType}/`);
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+
+        // --- LÓGICA PARA SUBIR ---
         document.getElementById('uploadForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-
-            const port = document.getElementById('port').value;
-            const uid = document.getElementById('uid').value;
-            const folder = document.getElementById('folder').value; 
+            const port = document.getElementById('uploadPort').value;
+            const uid = document.getElementById('uploadUid').value;
+            const folder = document.getElementById('uploadFolder').value;
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
-            const responseDiv = document.getElementById('response');
-
-            if (!file) { /* ... */ return; }
+            const responseDiv = document.getElementById('uploadResponse');
+            
+            if (!file) {
+                responseDiv.innerHTML = `<span class="error">Por favor, selecciona un archivo.</span>`;
+                return;
+            }
 
             const filename = file.name;
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('folder', folder); 
-
-            const targetUrl = `http://localhost:${port}/upload/${uid}/${filename}`;
-            responseDiv.innerHTML = `Subiendo '${filename}' a la carpeta '${folder}' de ${uid}...`;
-
+            formData.append('folder', folder);
+            
+            responseDiv.textContent = 'Subiendo...';
             try {
-                const response = await fetch(targetUrl, { method: 'POST', body: formData });
+                const response = await fetch(`http://localhost:${port}/upload/${uid}/${filename}`, { method: 'POST', body: formData });
                 const data = await response.json();
                 if (response.ok) {
-                    responseDiv.innerHTML = `<p style="color: green;">${data.message || 'Éxito!'}</p>`;
+                    responseDiv.innerHTML = `<span class="success">${data.message}</span>`;
                 } else {
-                    responseDiv.innerHTML = `<p style="color: red;">Error: ${data.error || 'Algo salió mal'}</p>`;
+                    responseDiv.innerHTML = `<span class="error">Error: ${data.error}</span>`;
                 }
-            } catch (error) { /* ... */ }
+            } catch (error) {
+                responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        });
+
+        // --- LÓGICA PARA DESCARGAR ---
+        document.getElementById('downloadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const port = document.getElementById('downloadPort').value;
+            const uid = document.getElementById('downloadUid').value;
+            const folder = document.getElementById('downloadFolder').value;
+            const filename = document.getElementById('downloadFilename').value;
+            const responseDiv = document.getElementById('downloadResponse');
+
+            const url = `http://localhost:${port}/download/${uid}/${folder}/${filename}`;
+            responseDiv.innerHTML = `Link generado: <a href="${url}" target="_blank">${url}</a><br><small>(Haz clic derecho y 'Guardar enlace como...' o haz clic para abrir)</small>`;
+        });
+
+        // --- LÓGICA PARA ELIMINAR ---
+        document.getElementById('deleteForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const port = document.getElementById('deletePort').value;
+            const uid = document.getElementById('deleteUid').value;
+            const filename = document.getElementById('deleteFilename').value;
+            const responseDiv = document.getElementById('deleteResponse');
+
+            responseDiv.textContent = 'Enviando solicitud de borrado...';
+            try {
+                const response = await fetch(`http://localhost:${port}/delete/${uid}/${filename}`, { method: 'DELETE' });
+                const data = await response.json();
+                if (response.ok) {
+                    responseDiv.innerHTML = `<span class="success">${data.message}</span>`;
+                } else {
+                    responseDiv.innerHTML = `<span class="error">Error: ${data.error}</span>`;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
         });
     </script>
 </body>

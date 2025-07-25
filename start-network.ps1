@@ -1,5 +1,5 @@
 $DockerHubUser = "manuelr12"
-$ImageTag = "v2.2" 
+$ImageTag = "v-final" 
 
 $ImageName = "$DockerHubUser/synchrontainer-image:$ImageTag"
 $NodeNames = "c1,c2,c3"
